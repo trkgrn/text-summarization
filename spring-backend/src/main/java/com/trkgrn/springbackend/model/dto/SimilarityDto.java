@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DocumentDto {
-    private Long documentId;
-    private String name;
-    private List<SentenceDto> sentences;
+public class SimilarityDto {
+    private Long similarityId;
+    private Double similarityRate;
+    private TargetSentenceDto sentence;
 }

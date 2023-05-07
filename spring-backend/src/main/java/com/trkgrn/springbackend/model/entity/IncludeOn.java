@@ -8,7 +8,7 @@ import org.springframework.data.neo4j.core.schema.*;
 public class IncludeOn {
     @Id
     @GeneratedValue
-    private Long id;
+    private Long includeOnId;
     @Property("sentence_no")
     private Integer sentenceNo;
 

@@ -1,10 +1,18 @@
 package com.trkgrn.springbackend.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SentenceDto {
-    private Long id;
+    private Long includeOnId;
     private Integer sentenceNo;
-    private String sentence;
+    private Long sentenceId;
+    private String text;
+    private List<SimilarityDto> similarities;
 }

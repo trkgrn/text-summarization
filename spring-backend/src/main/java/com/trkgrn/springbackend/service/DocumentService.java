@@ -5,10 +5,13 @@ import com.trkgrn.springbackend.model.dto.DocumentDto;
 import com.trkgrn.springbackend.model.entity.Document;
 import com.trkgrn.springbackend.model.entity.IncludeOn;
 import com.trkgrn.springbackend.model.entity.Sentence;
+import com.trkgrn.springbackend.model.entity.Similarity;
 import com.trkgrn.springbackend.repository.DocumentRepository;
 import com.trkgrn.springbackend.util.StringUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,29 +19,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
     private final DocumentRepository documentRepository;
+    private final SentenceService sentenceService;
     private final DocumentConverter converter;
     private final StringUtil stringUtil;
 
-    public DocumentService(DocumentRepository documentRepository, DocumentConverter converter, StringUtil stringUtil) {
-        this.documentRepository = documentRepository;
-        this.converter = converter;
-        this.stringUtil = stringUtil;
-    }
 
 
-    public DocumentDto getDocumentById(Long id) {
-       Optional<Document> documentOptional = Optional.ofNullable(documentRepository.getDocumentById(id));
-         if (documentOptional.isPresent()) {
-             Document document = documentOptional.get();
-              DocumentDto documentDto = converter.documentToDto(document);
-              return documentDto;
-            }
+    public DocumentDto getDocumentDtoById(Long id) {
+        Optional<Document> documentOptional = Optional.ofNullable(documentRepository.getDocumentByDocumentId(id));
+        if (documentOptional.isPresent()) {
+            Document document = documentOptional.get();
+            DocumentDto documentDto = converter.documentToDto(document);
+            return documentDto;
+        }
         return null;
     }
 
-    public DocumentDto createDocument(String document){
+    public Document getDocumentById(Long id) {
+        Optional<Document> documentOptional = Optional.ofNullable(documentRepository.getDocumentByDocumentId(id));
+        if (documentOptional.isPresent()) {
+            Document document = documentOptional.get();
+            return document;
+        }
+        return null;
+    }
+
+    public DocumentDto createDocument(String document) {
         List<String> sentences = stringUtil.splitSentences(document);
         Document documentEntity = new Document();
         documentEntity.setName(UUID.randomUUID().toString());
@@ -46,6 +55,7 @@ public class DocumentService {
         List<IncludeOn> sentenceEntities = sentences.stream().map(sentence -> {
             Sentence sentenceEntity = new Sentence();
             sentenceEntity.setText(sentence);
+            sentenceEntity.setSimilarities(List.of());
             IncludeOn includeOn = new IncludeOn();
             includeOn.setSentence(sentenceEntity);
             includeOn.setSentenceNo(sentenceNo.incrementAndGet());
@@ -53,9 +63,51 @@ public class DocumentService {
         }).collect(Collectors.toList());
         documentEntity.setSentences(sentenceEntities);
         Document savedDocument = documentRepository.save(documentEntity);
-        DocumentDto documentDto = converter.documentToDto(savedDocument);
+
+        List<Sentence> sentencesList = savedDocument.getSentences().stream()
+                .map(sentence -> sentence.getSentence())
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < sentencesList.size(); i++) {
+            List<Similarity> similarities = new ArrayList<>();
+            for (int j = i + 1; j < sentencesList.size(); j++) {
+                Similarity similarity = new Similarity();
+                similarity.setSimilarityRate(0.0);
+                similarity.setSentence(sentencesList.get(j));
+                similarities.add(similarity);
+            }
+            if (similarities.size() > 0) {
+                sentencesList.get(i).setSimilarities(similarities);
+            }
+        }
+        sentenceService.saveAll(sentencesList);
+        DocumentDto documentDto = getDocumentDtoById(savedDocument.getDocumentId());
         return documentDto;
     }
 
+    public void saveDocument(Document document) {
+        documentRepository.save(document);
+    }
 
+    public void saveSimilarities(DocumentDto documentDto) {
+
+        Document document = getDocumentById(documentDto.getDocumentId());
+
+        List<Sentence> sentencesList = document.getSentences().stream()
+                .map(sentence -> sentence.getSentence())
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < sentencesList.size(); i++) {
+            List<Similarity> similarities = sentencesList.get(i).getSimilarities();
+            for (int j = 0; j < similarities.size(); j++) {
+                similarities.get(j).setSimilarityRate(documentDto.getSentences().get(i).getSimilarities().get(j).getSimilarityRate());
+            }
+            if (similarities.size() > 0) {
+                sentencesList.get(i).setSimilarities(similarities);
+            }
+        }
+        sentenceService.saveAll(sentencesList);
+
+    }
 }
+
