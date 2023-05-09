@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class DocumentService {
+
     private final DocumentRepository documentRepository;
     private final SentenceService sentenceService;
     private final DocumentConverter converter;
@@ -89,10 +90,6 @@ public class DocumentService {
         return documentDto;
     }
 
-
-
-
-
     public void saveSentencesByDocumentDto(DocumentDto documentDto) {
 
         Document document = getDocumentById(documentDto.getDocumentId());
@@ -117,5 +114,6 @@ public class DocumentService {
         sentenceService.saveAll(sentencesList);
 
     }
+
 }
 

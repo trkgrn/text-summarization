@@ -27,3 +27,12 @@ def sentences_scores():
     print(document)
     processed_document = LanguageProcessService.calculate_sentence_score_by_document(document)
     return jsonify(processed_document)
+
+
+@language_process_bp.route('/api/v1/language-process/document/rouge-score', methods=['POST'])
+def calculate_rouge_score():
+    document = request.json
+    summary = document['summary']
+    reference = document['reference']
+    document['rougeScore'] = LanguageProcessService.calculate_rouge_score(summary, reference)
+    return jsonify(document)

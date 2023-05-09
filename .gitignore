@@ -1,0 +1,4 @@
+/flask-backend/.gitignore.txt
+__pycache__/
+*.pyc
+# Byte-compiled / optimized / DLL files

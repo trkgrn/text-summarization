@@ -2,6 +2,8 @@ package com.trkgrn.springbackend.controller;
 
 import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
+import com.trkgrn.springbackend.model.dto.SummarizedDocumentDto;
+import com.trkgrn.springbackend.model.dto.TextSummarizeRequestDto;
 import com.trkgrn.springbackend.service.DocumentService;
 import com.trkgrn.springbackend.service.LanguageProcessService;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +43,16 @@ public class DocumentController {
         documentService.saveSentencesByDocumentDto(documentDto);
         return ResponseEntity.ok(documentDto);
     }
+
+    @PostMapping("/text-summarize")
+    public ResponseEntity<SummarizedDocumentDto> summarizeText(@RequestBody TextSummarizeRequestDto textSummarizeRequest) {
+        SummarizedDocumentDto summarizedDocumentDto = languageProcessService.summarizeText(textSummarizeRequest.getText(),
+                textSummarizeRequest.getTitle(),
+                textSummarizeRequest.getSimilarityThreshold(),
+                textSummarizeRequest.getScoreThreshold(),
+                textSummarizeRequest.getReferenceSummary());
+        return ResponseEntity.ok(summarizedDocumentDto);
+    }
+
 
 }

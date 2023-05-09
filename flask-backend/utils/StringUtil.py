@@ -1,7 +1,7 @@
 import spacy
 from nltk.corpus import stopwords
 import re
-
+from rouge import Rouge
 
 def get_proper_names_by_sentence(sentence):
     nlp = spacy.load("en_core_web_sm")
@@ -129,3 +129,9 @@ def calculate_sentence_score(sentence, theme_words, title, total_node_count):
                         0.25 * (s_theme_words / s_len))
 
     return round(score * 100, 2)
+
+
+def calculate_rouge_score(summary, reference):
+    rouge = Rouge()
+    scores = rouge.get_scores(summary, reference)
+    return round(scores[0]["rouge-1"]["f"] * 100, 2)

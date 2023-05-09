@@ -33,3 +33,6 @@ def calculate_sentence_score_by_document(document):
 
     return document
 
+
+def calculate_rouge_score(summary, reference):
+    return StringUtil.calculate_rouge_score(summary, reference)

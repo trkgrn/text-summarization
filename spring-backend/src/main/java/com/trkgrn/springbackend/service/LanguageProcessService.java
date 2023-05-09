@@ -3,6 +3,7 @@ package com.trkgrn.springbackend.service;
 import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
 import com.trkgrn.springbackend.model.dto.SimilarityDto;
+import com.trkgrn.springbackend.model.dto.SummarizedDocumentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,16 @@ import java.util.Arrays;
 @Service
 @RequiredArgsConstructor
 public class LanguageProcessService {
-    private final SentenceService sentenceService;
+
     private final DocumentService documentService;
     private final RestTemplate restTemplate;
     private final HttpHeaders httpHeaders;
-    private final DocumentConverter converter;
 
     private static final String SIMILARITIES_API = "http://localhost:5000/api/v1/language-process/document/similarities";
     private static final String SENTENCE_SCORES_API = "http://localhost:5000/api/v1/language-process/document/sentence-scores";
+    private static final String ROUGE_SCORE_API = "http://localhost:5000/api/v1/language-process/document/rouge-score";
 
-    public void textSummarization(String text, String title, Double similarityThreshold, Double scoreThreshold) {
+    public SummarizedDocumentDto summarizeText(String text, String title, Double similarityThreshold, Double scoreThreshold, String referenceSummary) {
         DocumentDto document = documentService.createDocument(text, title); // STAGE 1
         DocumentDto processedDocument = getSimilaritiesByDocument(document); // STAGE 2
         processedDocument = calculateEdgeCount(processedDocument, similarityThreshold);
@@ -31,7 +32,11 @@ public class LanguageProcessService {
         documentService.saveSentencesByDocumentDto(processedDocument);
         processedDocument = summarizedDocumentDto(processedDocument, scoreThreshold); // STAGE 4
         documentService.saveSentencesByDocumentDto(processedDocument);
+        String summary = getSummarizedText(processedDocument);
+        SummarizedDocumentDto summarizedDocument = new SummarizedDocumentDto(summary, referenceSummary, 0.0, processedDocument);
+        summarizedDocument = calculateRougeScore(summarizedDocument); // STAGE 5
 
+        return summarizedDocument;
     }
 
 
@@ -83,6 +88,25 @@ public class LanguageProcessService {
         }
 
         return documentDto;
+    }
+
+    private String getSummarizedText(DocumentDto documentDto) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < documentDto.getSentences().size(); i++) {
+            if (documentDto.getSentences().get(i).getIsIncludedSummary()) {
+                sb.append(documentDto.getSentences().get(i).getText());
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+
+    public SummarizedDocumentDto calculateRougeScore(SummarizedDocumentDto summarizedDocumentDto) {
+        httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<SummarizedDocumentDto> request = new HttpEntity<>(summarizedDocumentDto, httpHeaders);
+        ResponseEntity<SummarizedDocumentDto> response = restTemplate.postForEntity(ROUGE_SCORE_API, request, SummarizedDocumentDto.class);
+        return response.getBody();
     }
 
 
