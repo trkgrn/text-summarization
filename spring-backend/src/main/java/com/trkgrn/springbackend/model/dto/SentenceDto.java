@@ -16,5 +16,6 @@ public class SentenceDto {
     private String text;
     private Integer numberOfEdgeExceedingThreshold;
     private Double sentenceScore;
+    private Boolean isIncludedSummary;
     private List<SimilarityDto> similarities;
 }

@@ -59,6 +59,7 @@ public class DocumentService {
             sentenceEntity.setSimilarities(List.of());
             sentenceEntity.setSentenceScore(0.0);
             sentenceEntity.setNumberOfEdgeExceedingThreshold(0);
+            sentenceEntity.setIsIncludedSummary(false);
             IncludeOn includeOn = new IncludeOn();
             includeOn.setSentence(sentenceEntity);
             includeOn.setSentenceNo(sentenceNo.incrementAndGet());
@@ -89,38 +90,10 @@ public class DocumentService {
     }
 
 
-    public void saveDocument(Document document) {
-        documentRepository.save(document);
-    }
-
-    public DocumentDto calculateEdgeCount(DocumentDto documentDto, Double threshold) {
-        for (int i=0; i<documentDto.getSentences().size(); i++){
-            documentDto.getSentences().get(i).setNumberOfEdgeExceedingThreshold(0);
-        }
-
-        for (int i = 0; i < documentDto.getSentences().size(); i++) {
-
-            for (SimilarityDto similarity : documentDto.getSentences().get(i).getSimilarities()) {
-                if (similarity.getSimilarityRate() > threshold) {
-                    Long sentenceId = similarity.getSentence().getSentenceId();
-                    documentDto.getSentences().get(i).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(i).getNumberOfEdgeExceedingThreshold() + 1);
-                    for (int j = i+1; j < documentDto.getSentences().size(); j++) {
-                        if (documentDto.getSentences().get(j).getSentenceId().equals(sentenceId)) {
-                            documentDto.getSentences().get(j).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(j).getNumberOfEdgeExceedingThreshold() + 1);
-                            break;
-                        }
-                    }
-                }
-            }
-
-        }
-        return documentDto;
-    }
 
 
-    public void saveSentencesByDocumentDto(DocumentDto documentDto, Double threshold) {
 
-        documentDto = calculateEdgeCount(documentDto,threshold);
+    public void saveSentencesByDocumentDto(DocumentDto documentDto) {
 
         Document document = getDocumentById(documentDto.getDocumentId());
 
@@ -139,6 +112,7 @@ public class DocumentService {
             }
             sentencesList.get(i).setSentenceScore(documentDto.getSentences().get(i).getSentenceScore());
             sentencesList.get(i).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(i).getNumberOfEdgeExceedingThreshold());
+            sentencesList.get(i).setIsIncludedSummary(documentDto.getSentences().get(i).getIsIncludedSummary());
         }
         sentenceService.saveAll(sentencesList);
 

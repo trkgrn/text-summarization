@@ -28,6 +28,7 @@ public class DocumentConverter {
                     sentenceDto.setSentenceNo(sentence.getSentenceNo());
                     sentenceDto.setNumberOfEdgeExceedingThreshold(sentence.getSentence().getNumberOfEdgeExceedingThreshold());
                     sentenceDto.setSentenceScore(sentence.getSentence().getSentenceScore());
+                    sentenceDto.setIsIncludedSummary(sentence.getSentence().getIsIncludedSummary());
                     sentenceDto.setSimilarities(sentence.getSentence().getSimilarities()
                             .stream()
                             .map(similarity -> {

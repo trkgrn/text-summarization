@@ -17,7 +17,6 @@ public class DocumentController {
     private final DocumentConverter converter;
 
 
-
     @GetMapping("/{id}")
     public ResponseEntity<DocumentDto> getDocumentById(@RequestParam Long id) {
         DocumentDto documentDto = documentService.getDocumentDtoById(id);
@@ -26,16 +25,20 @@ public class DocumentController {
 
     @PostMapping("/create")
     public ResponseEntity<DocumentDto> createDocument(@RequestBody String document, @RequestParam String title) {
-        DocumentDto createdDocumentDto = documentService.createDocument(document,title);
+        DocumentDto createdDocumentDto = documentService.createDocument(document, title);
         return ResponseEntity.ok(createdDocumentDto);
     }
 
-    @GetMapping("/{id}/threshold/{threshold}/similarities")
-    public ResponseEntity<DocumentDto> getDocumentSimilaritiesByThreshold(@PathVariable Long id, @PathVariable Double threshold) {
+    @GetMapping("/{id}/score-threshold/{scoreThreshold}/similarity-threshold/{similarityThreshold}/similarities")
+    public ResponseEntity<DocumentDto> getDocumentSimilaritiesByThreshold(@PathVariable Long id,
+                                                                          @PathVariable Double similarityThreshold,
+                                                                          @PathVariable Double scoreThreshold) {
         DocumentDto documentDto = documentService.getDocumentDtoById(id);
         documentDto = languageProcessService.getSimilaritiesByDocument(documentDto);
+        documentDto = languageProcessService.calculateEdgeCount(documentDto, similarityThreshold);
         documentDto = languageProcessService.getSentenceScoresByDocument(documentDto);
-        documentService.saveSentencesByDocumentDto(documentDto,threshold); // STAGE 3
+        documentDto = languageProcessService.summarizedDocumentDto(documentDto, scoreThreshold);
+        documentService.saveSentencesByDocumentDto(documentDto);
         return ResponseEntity.ok(documentDto);
     }
 
