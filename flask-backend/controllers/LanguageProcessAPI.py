@@ -9,12 +9,21 @@ language_process_bp = Blueprint('language_process_bp', __name__)
 def similarity():
     ss1 = request.json.get('s1')
     ss2 = request.json.get('s2')
-    s = GloveUtil.cosine_distance_wordembedding_method(ss1,ss2)
+    s = GloveUtil.cosine_distance_wordembedding_method(ss1, ss2)
     return jsonify(similarity=s)
+
 
 @language_process_bp.route('/api/v1/language-process/document/similarities', methods=['POST'])
 def similarities():
-    document = request.json['document']
+    document = request.json
     print(document)
     processed_document = LanguageProcessService.get_similarities_by_document(document)
-    return jsonify(document=processed_document)
+    return jsonify(processed_document)
+
+
+@language_process_bp.route('/api/v1/language-process/document/sentence-scores', methods=['POST'])
+def sentences_scores():
+    document = request.json
+    print(document)
+    processed_document = LanguageProcessService.calculate_sentence_score_by_document(document)
+    return jsonify(processed_document)

@@ -25,6 +25,8 @@ public class Sentence {
     @GeneratedValue
     private Long sentenceId;
     private String text;
+    private Integer numberOfEdgeExceedingThreshold;
+    private Double sentenceScore;
 
     @Relationship(type = "SIMILARITY", direction = Relationship.Direction.OUTGOING)
     private List<Similarity> similarities;

@@ -17,6 +17,7 @@ public class Document {
     @GeneratedValue
     private Long documentId;
     private String name;
+    private String title;
     @Relationship(type = "INCLUDE_ON", direction = Relationship.Direction.OUTGOING)
     private List<IncludeOn> sentences;
 

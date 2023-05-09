@@ -12,5 +12,6 @@ import java.util.List;
 public class DocumentDto {
     private Long documentId;
     private String name;
+    private String title;
     private List<SentenceDto> sentences;
 }

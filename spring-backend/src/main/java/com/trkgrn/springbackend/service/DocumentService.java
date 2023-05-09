@@ -2,6 +2,7 @@ package com.trkgrn.springbackend.service;
 
 import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
+import com.trkgrn.springbackend.model.dto.SimilarityDto;
 import com.trkgrn.springbackend.model.entity.Document;
 import com.trkgrn.springbackend.model.entity.IncludeOn;
 import com.trkgrn.springbackend.model.entity.Sentence;
@@ -27,7 +28,6 @@ public class DocumentService {
     private final StringUtil stringUtil;
 
 
-
     public DocumentDto getDocumentDtoById(Long id) {
         Optional<Document> documentOptional = Optional.ofNullable(documentRepository.getDocumentByDocumentId(id));
         if (documentOptional.isPresent()) {
@@ -47,15 +47,18 @@ public class DocumentService {
         return null;
     }
 
-    public DocumentDto createDocument(String document) {
+    public DocumentDto createDocument(String document, String title) {
         List<String> sentences = stringUtil.splitSentences(document);
         Document documentEntity = new Document();
         documentEntity.setName(UUID.randomUUID().toString());
+        documentEntity.setTitle(title);
         AtomicInteger sentenceNo = new AtomicInteger(0);
         List<IncludeOn> sentenceEntities = sentences.stream().map(sentence -> {
             Sentence sentenceEntity = new Sentence();
             sentenceEntity.setText(sentence);
             sentenceEntity.setSimilarities(List.of());
+            sentenceEntity.setSentenceScore(0.0);
+            sentenceEntity.setNumberOfEdgeExceedingThreshold(0);
             IncludeOn includeOn = new IncludeOn();
             includeOn.setSentence(sentenceEntity);
             includeOn.setSentenceNo(sentenceNo.incrementAndGet());
@@ -85,17 +88,46 @@ public class DocumentService {
         return documentDto;
     }
 
+
     public void saveDocument(Document document) {
         documentRepository.save(document);
     }
 
-    public void saveSimilarities(DocumentDto documentDto) {
+    public DocumentDto calculateEdgeCount(DocumentDto documentDto, Double threshold) {
+        for (int i=0; i<documentDto.getSentences().size(); i++){
+            documentDto.getSentences().get(i).setNumberOfEdgeExceedingThreshold(0);
+        }
+
+        for (int i = 0; i < documentDto.getSentences().size(); i++) {
+
+            for (SimilarityDto similarity : documentDto.getSentences().get(i).getSimilarities()) {
+                if (similarity.getSimilarityRate() > threshold) {
+                    Long sentenceId = similarity.getSentence().getSentenceId();
+                    documentDto.getSentences().get(i).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(i).getNumberOfEdgeExceedingThreshold() + 1);
+                    for (int j = i+1; j < documentDto.getSentences().size(); j++) {
+                        if (documentDto.getSentences().get(j).getSentenceId().equals(sentenceId)) {
+                            documentDto.getSentences().get(j).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(j).getNumberOfEdgeExceedingThreshold() + 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        return documentDto;
+    }
+
+
+    public void saveSentencesByDocumentDto(DocumentDto documentDto, Double threshold) {
+
+        documentDto = calculateEdgeCount(documentDto,threshold);
 
         Document document = getDocumentById(documentDto.getDocumentId());
 
         List<Sentence> sentencesList = document.getSentences().stream()
                 .map(sentence -> sentence.getSentence())
                 .collect(Collectors.toList());
+
 
         for (int i = 0; i < sentencesList.size(); i++) {
             List<Similarity> similarities = sentencesList.get(i).getSimilarities();
@@ -105,6 +137,8 @@ public class DocumentService {
             if (similarities.size() > 0) {
                 sentencesList.get(i).setSimilarities(similarities);
             }
+            sentencesList.get(i).setSentenceScore(documentDto.getSentences().get(i).getSentenceScore());
+            sentencesList.get(i).setNumberOfEdgeExceedingThreshold(documentDto.getSentences().get(i).getNumberOfEdgeExceedingThreshold());
         }
         sentenceService.saveAll(sentencesList);
 

@@ -2,9 +2,11 @@ import numpy as np
 import re
 import scipy
 from nltk.corpus import stopwords
+from utils import StringUtil
 
 
 def preprocess(raw_text):
+
     # keep only words
     letters_only_text = re.sub("[^a-zA-Z]", " ", raw_text)
 
@@ -13,8 +15,8 @@ def preprocess(raw_text):
 
     # remove stopwords
     stopword_set = set(stopwords.words("english"))
-    cleaned_words = list(set([w for w in words if w not in stopword_set]))
-    print("cleaned_words =" + cleaned_words.__str__())
+    cleaned_words = list([w for w in words if w not in stopword_set])
+    # print("cleaned_words =" + cleaned_words.__str__())
 
     return cleaned_words
 

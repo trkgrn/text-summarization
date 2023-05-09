@@ -2,7 +2,6 @@ package com.trkgrn.springbackend.controller;
 
 import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
-import com.trkgrn.springbackend.model.entity.Document;
 import com.trkgrn.springbackend.service.DocumentService;
 import com.trkgrn.springbackend.service.LanguageProcessService;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +24,18 @@ public class DocumentController {
         return ResponseEntity.ok(documentDto);
     }
 
-    @PostMapping
-    public ResponseEntity<DocumentDto> createDocument(@RequestBody String document) {
-        DocumentDto createdDocumentDto = documentService.createDocument(document);
+    @PostMapping("/create")
+    public ResponseEntity<DocumentDto> createDocument(@RequestBody String document, @RequestParam String title) {
+        DocumentDto createdDocumentDto = documentService.createDocument(document,title);
         return ResponseEntity.ok(createdDocumentDto);
     }
 
-    @GetMapping("/{id}/similarities")
-    public ResponseEntity<DocumentDto> getDocumentSimilarities(@PathVariable Long id) {
+    @GetMapping("/{id}/threshold/{threshold}/similarities")
+    public ResponseEntity<DocumentDto> getDocumentSimilaritiesByThreshold(@PathVariable Long id, @PathVariable Double threshold) {
         DocumentDto documentDto = documentService.getDocumentDtoById(id);
         documentDto = languageProcessService.getSimilaritiesByDocument(documentDto);
-        documentService.saveSimilarities(documentDto); // STAGE 3
+        documentDto = languageProcessService.getSentenceScoresByDocument(documentDto);
+        documentService.saveSentencesByDocumentDto(documentDto,threshold); // STAGE 3
         return ResponseEntity.ok(documentDto);
     }
 

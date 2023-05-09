@@ -17,6 +17,7 @@ public class DocumentConverter {
         DocumentDto documentDto = new DocumentDto();
         documentDto.setDocumentId(document.getDocumentId());
         documentDto.setName(document.getName());
+        documentDto.setTitle(document.getTitle());
         documentDto.setSentences(document.getSentences()
                 .stream()
                 .map(sentence -> {
@@ -25,6 +26,8 @@ public class DocumentConverter {
                     sentenceDto.setSentenceId(sentence.getSentence().getSentenceId());
                     sentenceDto.setText(sentence.getSentence().getText());
                     sentenceDto.setSentenceNo(sentence.getSentenceNo());
+                    sentenceDto.setNumberOfEdgeExceedingThreshold(sentence.getSentence().getNumberOfEdgeExceedingThreshold());
+                    sentenceDto.setSentenceScore(sentence.getSentence().getSentenceScore());
                     sentenceDto.setSimilarities(sentence.getSentence().getSimilarities()
                             .stream()
                             .map(similarity -> {
