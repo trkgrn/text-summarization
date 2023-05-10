@@ -10,6 +10,8 @@ import {FormsModule} from "@angular/forms";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatStepperModule} from "@angular/material/stepper";
 import {MatButtonModule} from "@angular/material/button";
+import {MatTableModule} from "@angular/material/table";
+import {MatSortModule} from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import {MatButtonModule} from "@angular/material/button";
     FormsModule,
     BrowserAnimationsModule,
     MatStepperModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTableModule,
+    MatSortModule
   ],
   providers: [DocumentService],
   bootstrap: [AppComponent]

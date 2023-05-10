@@ -38,7 +38,25 @@ export class VisComponent implements OnInit {
       },
       manipulation: {
         enabled: false
-      }
+      },
+      physics: {
+        enabled: false,
+      },
+      edges: {
+        font: {
+          size: 12,
+        },
+        widthConstraint: {
+          maximum: 90,
+        },
+      },
+      nodes: {
+        shape: "box",
+        margin: 10,
+        widthConstraint: {
+          maximum: 200,
+        },
+      },
     };
     var container = this.networkContainer!.nativeElement;
     this.network = new vis.Network(container, treedata, options);
