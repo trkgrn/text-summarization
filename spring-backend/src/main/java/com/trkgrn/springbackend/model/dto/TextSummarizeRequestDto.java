@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class TextSummarizeRequestDto {
 
+    private String uuid;
     private String text;
     private String title;
     private String referenceSummary;

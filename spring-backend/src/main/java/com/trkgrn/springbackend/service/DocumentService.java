@@ -2,7 +2,6 @@ package com.trkgrn.springbackend.service;
 
 import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
-import com.trkgrn.springbackend.model.dto.SimilarityDto;
 import com.trkgrn.springbackend.model.entity.Document;
 import com.trkgrn.springbackend.model.entity.IncludeOn;
 import com.trkgrn.springbackend.model.entity.Sentence;
@@ -48,10 +47,10 @@ public class DocumentService {
         return null;
     }
 
-    public DocumentDto createDocument(String document, String title) {
+    public DocumentDto createDocument(String uuid,String document, String title) {
         List<String> sentences = stringUtil.splitSentences(document);
         Document documentEntity = new Document();
-        documentEntity.setName(UUID.randomUUID().toString());
+        documentEntity.setName(uuid);
         documentEntity.setTitle(title);
         AtomicInteger sentenceNo = new AtomicInteger(0);
         List<IncludeOn> sentenceEntities = sentences.stream().map(sentence -> {

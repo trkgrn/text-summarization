@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController("/api/v1/document")
 @RequiredArgsConstructor
 public class DocumentController {
@@ -27,7 +29,7 @@ public class DocumentController {
 
     @PostMapping("/create")
     public ResponseEntity<DocumentDto> createDocument(@RequestBody String document, @RequestParam String title) {
-        DocumentDto createdDocumentDto = documentService.createDocument(document, title);
+        DocumentDto createdDocumentDto = documentService.createDocument(UUID.randomUUID().toString(),document, title);
         return ResponseEntity.ok(createdDocumentDto);
     }
 
@@ -46,7 +48,7 @@ public class DocumentController {
 
     @PostMapping("/text-summarize")
     public ResponseEntity<SummarizedDocumentDto> summarizeText(@RequestBody TextSummarizeRequestDto textSummarizeRequest) {
-        SummarizedDocumentDto summarizedDocumentDto = languageProcessService.summarizeText(textSummarizeRequest.getText(),
+        SummarizedDocumentDto summarizedDocumentDto = languageProcessService.summarizeText(textSummarizeRequest.getUuid(),textSummarizeRequest.getText(),
                 textSummarizeRequest.getTitle(),
                 textSummarizeRequest.getSimilarityThreshold(),
                 textSummarizeRequest.getScoreThreshold(),

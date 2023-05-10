@@ -2,3 +2,4 @@
 __pycache__/
 *.pyc
 # Byte-compiled / optimized / DLL files
+flask-backend/glove.6B.50d.txt

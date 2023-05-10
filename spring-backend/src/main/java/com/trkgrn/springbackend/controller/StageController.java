@@ -1,13 +1,15 @@
 package com.trkgrn.springbackend.controller;
 
+import com.trkgrn.springbackend.model.dto.MessageDto;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
+@CrossOrigin(origins = "*")
 public class StageController {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -17,9 +19,9 @@ public class StageController {
     }
 
     @MessageMapping("/stage/{documentId}")
-    public void convertAndSend(@DestinationVariable(value = "documentId") Long documentID, String stage) {
-        System.out.println("handledDoc: " + documentID + " stage:" + stage);
-        messagingTemplate.convertAndSend("/topic/documents/" + documentID, stage);
+    public void convertAndSend(@DestinationVariable(value = "documentId") String documentID,@Payload MessageDto message) {
+        System.out.println("handledDoc: " + documentID + " stage:" + message);
+        messagingTemplate.convertAndSend("/topic/documents/" + documentID, message);
     }
 
 

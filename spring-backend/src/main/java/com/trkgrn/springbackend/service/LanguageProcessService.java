@@ -1,11 +1,14 @@
 package com.trkgrn.springbackend.service;
 
-import com.trkgrn.springbackend.converter.DocumentConverter;
 import com.trkgrn.springbackend.model.dto.DocumentDto;
 import com.trkgrn.springbackend.model.dto.SimilarityDto;
 import com.trkgrn.springbackend.model.dto.SummarizedDocumentDto;
+import com.trkgrn.springbackend.service.kafka.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,13 +21,15 @@ public class LanguageProcessService {
     private final DocumentService documentService;
     private final RestTemplate restTemplate;
     private final HttpHeaders httpHeaders;
+    private final KafkaProducerService producerService;
 
     private static final String SIMILARITIES_API = "http://localhost:5000/api/v1/language-process/document/similarities";
     private static final String SENTENCE_SCORES_API = "http://localhost:5000/api/v1/language-process/document/sentence-scores";
     private static final String ROUGE_SCORE_API = "http://localhost:5000/api/v1/language-process/document/rouge-score";
 
-    public SummarizedDocumentDto summarizeText(String text, String title, Double similarityThreshold, Double scoreThreshold, String referenceSummary) {
-        DocumentDto document = documentService.createDocument(text, title); // STAGE 1
+    public SummarizedDocumentDto summarizeText(String uuid,String text, String title, Double similarityThreshold, Double scoreThreshold, String referenceSummary) {
+        DocumentDto document = documentService.createDocument(uuid,text, title); // STAGE 1
+        producerService.send("name="+document.getName()+",stage=STEP_1");
         DocumentDto processedDocument = getSimilaritiesByDocument(document); // STAGE 2
         processedDocument = calculateEdgeCount(processedDocument, similarityThreshold);
         documentService.saveSentencesByDocumentDto(processedDocument);
@@ -34,6 +39,7 @@ public class LanguageProcessService {
         documentService.saveSentencesByDocumentDto(processedDocument);
         String summary = getSummarizedText(processedDocument);
         SummarizedDocumentDto summarizedDocument = new SummarizedDocumentDto(summary, referenceSummary, 0.0, processedDocument);
+        producerService.send("name="+document.getName()+",stage=STEP_4");
         summarizedDocument = calculateRougeScore(summarizedDocument); // STAGE 5
 
         return summarizedDocument;
