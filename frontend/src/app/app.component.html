@@ -1,86 +1,108 @@
-<ngx-graph
-  class="chart-container"
-  [view]="[800, 550]"
-  [links]="[
-    {
-      id: 'a',
-      source: 'first',
-      target: 'second',
-      label: 'is parent of'
-    }, {
-      id: 'b',
-      source: 'first',
-      target: 'c1',
-      label: 'custom label'
-    }, {
-      id: 'd',
-      source: 'first',
-      target: 'c2',
-      label: 'custom label'
-    }, {
-      id: 'e',
-      source: 'c1',
-      target: 'd',
-      label: 'first link'
-    }, {
-      id: 'f',
-      source: 'c1',
-      target: 'd',
-      label: 'second link'
-    }
-  ]"
-  [nodes]="[
-    {
-      id: 'first',
-      label: 'A'
-    }, {
-      id: 'second',
-      label: 'B'
-    }, {
-      id: 'c1',
-      label: 'C1'
-    }, {
-      id: 'c2',
-      label: 'C2'
-    }, {
-      id: 'd',
-      label: 'D'
-    }
-  ]"
-  layout="dagreCluster"
-  xmlns:svg="">
-  <ng-template #defsTemplate>
-    <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
-      <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
-    </svg:marker>
-  </ng-template>
+<div class="row h-100 justify-content-center align-items-center mt-3">
+  <div class="col-12">
+    <div class="container">
+      <div class="row h-100 justify-content-center align-items-center m-0">
+        <div class="col-12">
 
-  <ng-template #nodeTemplate let-node>
-    <svg:g class="node">
-      <svg:rect
-        [attr.width]="node.dimension.width"
-        [attr.height]="node.dimension.height"
-        [attr.fill]="node.data.color"
-      />
-      <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height / 2">
-        {{node.label}}
-      </svg:text>
-    </svg:g>
-  </ng-template>
+          <div class="card card-outline card-primary">
 
-  <ng-template #linkTemplate let-link>
-    <svg:g class="edge">
-      <svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
-      <svg:text class="edge-label" text-anchor="middle">
-        <textPath
-          class="text-path"
-          [attr.href]="'#' + link.id"
-          [style.dominant-baseline]="link.dominantBaseline"
-          startOffset="50%"
-        >
-          {{link.label}}
-        </textPath>
-      </svg:text>
-    </svg:g>
-  </ng-template>
-</ngx-graph>
+            <div class="card-header text-center">
+              <h1 class="card-title"><b>Summarize </b>DOCS</h1>
+            </div>
+
+            <div class="card-body">
+              <mat-horizontal-stepper linear #stepper labelPosition="bottom">
+                <mat-step >
+                  <ng-template matStepLabel>Upload Document</ng-template>
+                  <div class="row h-100 justify-content-center align-items-center mt-3">
+                    <div class="col-12">
+                      <div class="container">
+                        <div class="row h-100 justify-content-center align-items-center m-0">
+                          <div class="col-8">
+                            <label>Document</label>
+                            <div class="input-group mb-3">
+                              <input class="form-control" type="file" (change)="readDocument($event)">
+                            </div>
+
+                            <label>Reference Summary</label>
+                            <div class="input-group mb-3">
+                              <textarea class="form-control" [(ngModel)]="request.referenceSummary"></textarea>
+                            </div>
+
+                            <label>Score Threshold</label>
+                            <div class="input-group mb-3">
+                              <div class="slider-container">
+                                <input [(ngModel)]="request.scoreThreshold" type="range" class="form-control form-range"
+                                       oninput="document.getElementById('score').innerHTML = this.value;" min="0" max="100"
+                                       step="1">
+                                <span id="score"></span>
+                              </div>
+                            </div>
+
+                            <label>Similarity Threshold</label>
+                            <div class="input-group mb-3">
+                              <div class="slider-container">
+                                <input [(ngModel)]="request.similarityThreshold" type="range"
+                                       class="form-control form-range"
+                                       oninput="document.getElementById('similarity').innerHTML = this.value;" min="0"
+                                       max="100"
+                                       step="1">
+                                <span id="similarity"></span>
+                              </div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                              <button class="form-control" mat-button matStepperNext (click)="setStepper(stepper)" [disabled]="!isValidRequest()">Summarize</button>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Create Graph</ng-template>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Calculate Similarities</ng-template>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Calculate Sentence Scores</ng-template>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Summarize Document</ng-template>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Calculate Rouge Score</ng-template>
+                </mat-step>
+
+                <mat-step>
+                  <ng-template matStepLabel>Done</ng-template>
+                  <p>You are now done.</p>
+                  <div>
+                    <app-vis [treeData]="getTreeData()"></app-vis>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button (click)="stepper.reset()">Reset</button>
+                  </div>
+                </mat-step>
+              </mat-horizontal-stepper>
+
+
+              <button class="btn btn-primary" (click)="test()">Test</button>
+              <pre>{{request | json}}</pre>
+
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
