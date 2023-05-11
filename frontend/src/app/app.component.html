@@ -94,7 +94,9 @@
                       <app-vis [treeData]="getTreeData()"></app-vis>
 
                       <div class="m-3">
-                        <h3>Rouge Score : {{response.rougeScore}}%</h3>
+                        <h3 class="mb-1">Sentence Score Threshold : {{request.scoreThreshold}}%</h3>
+                        <h3 class="mb-1">Similarity Threshold : {{request.similarityThreshold}}%</h3>
+                        <h3 class="mb-1">Rouge Score : {{response.rougeScore}}%</h3>
 
                       </div>
 
@@ -155,7 +157,7 @@
                             <th mat-header-cell *matHeaderCellDef>
                               Is Included Summary
                             </th>
-                            <td mat-cell *matCellDef="let element"> {{element.isIncludedSummary}} </td>
+                            <td mat-cell *matCellDef="let element"> {{element.isIncludedSummary ? 'YES':'NO'}} </td>
                           </ng-container>
 
 

@@ -31,24 +31,64 @@ export class AppComponent implements OnInit {
 
 
   getTreeData() {
+    var nodes: {
+      id: number; label: string; title: string; x: number; y: number;
+      shape: string; physics: boolean; color: any
+    }[] = []
+    var edges: { from: number; to: number; label: string; labelHighlightBold:boolean; color:any }[] = []
+
     var sentences = this.response.document.sentences;
-    var nodes: { id: number; label: string; title: string; }[] = []
+
+    var nodeCount = sentences.length;
+    var radius = nodeCount * 40;
+
+
     sentences.map((sentence, index) => {
-      nodes.push({id: sentence.sentenceId, label: sentence.text, title: sentence.text})
+      var angle = index * 2 * Math.PI / nodeCount;
+      var x = radius * Math.cos(angle) + 300;
+      var y = radius * Math.sin(angle) + 300;
+      var id = sentence.sentenceId;
+      nodes.push({
+        id: id, label: sentence.text, title: sentence.sentenceNo.toString(), x: x, y: y, shape: 'box', physics: false,
+        color: {background: '#97C2FC', border: '#2B7CE9', highlight: {background: '#D2E5FF', border: '#2B7CE9'}}
+      })
+      nodes.push({id: id + 1000, label: sentence.sentenceScore.toString(),
+        title: sentence.sentenceScore.toString(), x: 0, y: 0, shape: 'circle', physics: true,
+        color: {background: '#ef6767', border: '#ef6767', highlight: {background: '#ef6767', border: '#ef6767'},
+        hover: {background: '#ef6767', border: '#ef6767'}}
+      });
+      nodes.push({id: id + 2000, label: sentence.numberOfEdgeExceedingThreshold.toString(),
+        title: sentence.numberOfEdgeExceedingThreshold.toString(), x: 0, y: 0, shape: 'circle', physics: true,
+        color: {background: '#f4cf73', border: '#f4cf73', highlight: {background: '#fdc452', border: '#fdc452'},
+        hover: {background: '#fdc452', border: '#fdc452'}}
+      });
+      edges.push({from: id, to: id + 1000, label: '', labelHighlightBold: false, color: '#97C2FC'});
+      edges.push({from: id, to: id + 2000, label: '', labelHighlightBold: false, color: '#97C2FC'});
+
     });
-    var edges: { from: number; to: number; label: string; }[] = []
+
 
     sentences.map((sentence, index) => {
       sentence.similarities.map((similarity) => {
-        edges.push({from: sentence.sentenceId, to: similarity.sentence.sentenceId, label: similarity.similarityRate.toString()})
+       const isIncluded = similarity.similarityRate > this.request.similarityThreshold;
+        edges.push({
+          from: sentence.sentenceId,
+          to: similarity.sentence.sentenceId,
+          label: similarity.similarityRate.toString(),
+          labelHighlightBold: isIncluded,
+          color:{
+            color: isIncluded ? '#ef6767' : '#97C2FC',
+            highlight: isIncluded ? '#ef6767' : '#97C2FC',
+            hover: isIncluded ? '#ef6767' : '#97C2FC'
+          }
+        })
       })
     });
 
-    var treeData = {
+    return {
       nodes: nodes,
       edges: edges
     };
-    return treeData;
   }
 
 
@@ -89,9 +129,9 @@ export class AppComponent implements OnInit {
   }
 
   async summarize(stepper: MatStepper) {
-    this.connectByUUID(this.request.uuid,stepper);
+    this.connectByUUID(this.request.uuid, stepper);
     await this.service.summarizeText(this.request)
-      .then((response:any) => {
+      .then((response: any) => {
         this.isActive = true;
         console.log(response)
         this.response = response;
@@ -100,7 +140,7 @@ export class AppComponent implements OnInit {
       });
   }
 
-  connectByUUID(uuid: string,stepper: MatStepper) {
+  connectByUUID(uuid: string, stepper: MatStepper) {
     const destination = '/topic/documents/' + uuid;
     this.socket = new SockJS(this.baseUrl + '/socket');
     let stompClient: Stomp.Client = Stomp.over(this.socket);
@@ -111,7 +151,7 @@ export class AppComponent implements OnInit {
         destination,
         async (response) => {
           let step = JSON.parse(response.body);
-          console.log("STEPP: "+JSON.stringify(step));
+          console.log("STEPP: " + JSON.stringify(step));
           stepper.next();
         }
       );
@@ -123,5 +163,8 @@ export class AppComponent implements OnInit {
     this.request = new TextSummarizeRequest();
     stepper.reset();
   }
+
+
+
 
 }
