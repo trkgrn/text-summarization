@@ -12,11 +12,14 @@ import {MatStepperModule} from "@angular/material/stepper";
 import {MatButtonModule} from "@angular/material/button";
 import {MatTableModule} from "@angular/material/table";
 import {MatSortModule} from "@angular/material/sort";
+import {NgxSpinnerModule} from "ngx-spinner";
+import { SpinnerComponent } from './components/spinner/spinner.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    VisComponent
+    VisComponent,
+    SpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +30,8 @@ import {MatSortModule} from "@angular/material/sort";
     MatStepperModule,
     MatButtonModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    NgxSpinnerModule
   ],
   providers: [DocumentService],
   bootstrap: [AppComponent]

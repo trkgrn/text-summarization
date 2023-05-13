@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
       id: number; label: string; title: string; x: number; y: number;
       shape: string; physics: boolean; color: any
     }[] = []
-    var edges: { from: number; to: number; label: string; labelHighlightBold:boolean; color:any }[] = []
+    var edges: { from: number; to: number; label: string; labelHighlightBold: boolean; color: any }[] = []
 
     var sentences = this.response.document.sentences;
 
@@ -52,15 +52,21 @@ export class AppComponent implements OnInit {
         id: id, label: sentence.text, title: sentence.sentenceNo.toString(), x: x, y: y, shape: 'box', physics: false,
         color: {background: '#97C2FC', border: '#2B7CE9', highlight: {background: '#D2E5FF', border: '#2B7CE9'}}
       })
-      nodes.push({id: id + 1000, label: sentence.sentenceScore.toString(),
+      nodes.push({
+        id: id + 1000, label: sentence.sentenceScore.toString(),
         title: sentence.sentenceScore.toString(), x: 0, y: 0, shape: 'circle', physics: true,
-        color: {background: '#ef6767', border: '#ef6767', highlight: {background: '#ef6767', border: '#ef6767'},
-        hover: {background: '#ef6767', border: '#ef6767'}}
+        color: {
+          background: '#ef6767', border: '#ef6767', highlight: {background: '#ef6767', border: '#ef6767'},
+          hover: {background: '#ef6767', border: '#ef6767'}
+        }
       });
-      nodes.push({id: id + 2000, label: sentence.numberOfEdgeExceedingThreshold.toString(),
+      nodes.push({
+        id: id + 2000, label: sentence.numberOfEdgeExceedingThreshold.toString(),
         title: sentence.numberOfEdgeExceedingThreshold.toString(), x: 0, y: 0, shape: 'circle', physics: true,
-        color: {background: '#f4cf73', border: '#f4cf73', highlight: {background: '#fdc452', border: '#fdc452'},
-        hover: {background: '#fdc452', border: '#fdc452'}}
+        color: {
+          background: '#f4cf73', border: '#f4cf73', highlight: {background: '#fdc452', border: '#fdc452'},
+          hover: {background: '#fdc452', border: '#fdc452'}
+        }
       });
       edges.push({from: id, to: id + 1000, label: '', labelHighlightBold: false, color: '#97C2FC'});
       edges.push({from: id, to: id + 2000, label: '', labelHighlightBold: false, color: '#97C2FC'});
@@ -70,13 +76,13 @@ export class AppComponent implements OnInit {
 
     sentences.map((sentence, index) => {
       sentence.similarities.map((similarity) => {
-       const isIncluded = similarity.similarityRate > this.request.similarityThreshold;
+        const isIncluded = similarity.similarityRate > this.request.similarityThreshold;
         edges.push({
           from: sentence.sentenceId,
           to: similarity.sentence.sentenceId,
           label: similarity.similarityRate.toString(),
           labelHighlightBold: isIncluded,
-          color:{
+          color: {
             color: isIncluded ? '#ef6767' : '#97C2FC',
             highlight: isIncluded ? '#ef6767' : '#97C2FC',
             hover: isIncluded ? '#ef6767' : '#97C2FC'
@@ -129,6 +135,7 @@ export class AppComponent implements OnInit {
   }
 
   async summarize(stepper: MatStepper) {
+
     this.connectByUUID(this.request.uuid, stepper);
     await this.service.summarizeText(this.request)
       .then((response: any) => {
@@ -163,8 +170,6 @@ export class AppComponent implements OnInit {
     this.request = new TextSummarizeRequest();
     stepper.reset();
   }
-
-
 
 
 }

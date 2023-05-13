@@ -68,22 +68,27 @@
 
                 <mat-step>
                   <ng-template matStepLabel>Create Graph</ng-template>
+                  <app-spinner text="Creating Graph.."></app-spinner>
                 </mat-step>
 
                 <mat-step>
                   <ng-template matStepLabel>Calculate Similarities</ng-template>
+                  <app-spinner text="Calculating similarities.."></app-spinner>
                 </mat-step>
 
                 <mat-step>
                   <ng-template matStepLabel>Calculate Sentence Scores</ng-template>
+                  <app-spinner text="Calculating sentence scores.."></app-spinner>
                 </mat-step>
 
                 <mat-step>
                   <ng-template matStepLabel>Summarize Document</ng-template>
+                  <app-spinner text="Creating a summary document.."></app-spinner>
                 </mat-step>
 
                 <mat-step>
                   <ng-template matStepLabel>Calculate Rouge Score</ng-template>
+                  <app-spinner text="Calculating rouge score.."></app-spinner>
                 </mat-step>
 
                 <mat-step>
@@ -157,7 +162,7 @@
                             <th mat-header-cell *matHeaderCellDef>
                               Is Included Summary
                             </th>
-                            <td mat-cell *matCellDef="let element"> {{element.isIncludedSummary ? 'YES':'NO'}} </td>
+                            <td mat-cell *matCellDef="let element"> {{element.isIncludedSummary ? 'YES' : 'NO'}} </td>
                           </ng-container>
 
 
