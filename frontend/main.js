@@ -13,4 +13,5 @@ function createWindow () {
   })
 // and load the index.html of the app.
   win.loadFile('dist/text-summarization-frontend/index.html')
+  win.setMenuBarVisibility(false)
 }
