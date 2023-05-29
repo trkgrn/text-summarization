@@ -1,5 +1,5 @@
 
-# falling-letters-mobile-app
+# text-summarization
 
 The main goal of the project is to convert sentences into a graph structure and perform Sentence Selection-based Summarization. By transforming sentences into a graph, the project aims to visualize the semantic relationships among sentences in the text and identify important sentences based on these relationships.
 
