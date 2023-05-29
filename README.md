@@ -42,11 +42,13 @@ The main goal of the project is to convert sentences into a graph structure and 
   * Neo4J
 ## System Design
 
-![System Design](https://raw.githubusercontent.com/trkgrn/text-summarization/master/pics/diagram.png?token=GHSAT0AAAAAAB74I6GUJ5KFR3JWM7XEOE52ZDUSLXA)
+![System Design](https://raw.githubusercontent.com/trkgrn/text-summarization/master/pics/diagram.png?token=GHSAT0AAAAAAB74I6GVYG2YMDZ66EYKJQLEZDU3R6Q)
+
+
 ## Screenshots
 
 
-![App](https://raw.githubusercontent.com/trkgrn/text-summarization/master/pics/text-summarization.gif?token=GHSAT0AAAAAAB74I6GUUOZYDYA5VWJFFFKYZDUSMHA)
+![App](https://raw.githubusercontent.com/trkgrn/text-summarization/master/pics/text-summarization.gif?token=GHSAT0AAAAAAB74I6GUBFCTE4HLYQVDUICEZDU3TFA)
 
 ## Authors
 
